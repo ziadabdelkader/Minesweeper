@@ -99,7 +99,7 @@ public class PanelImp implements Panel {
                     digAround(i,j);
 
             }
-            if(gameStatus!=GameStatus.going)
+            if(gameStatus==GameStatus.lose)
                 digAllBombs();
             return true;
         }
