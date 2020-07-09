@@ -37,14 +37,21 @@ public class PanelImp implements Panel {
     }
 
     private void increaseAroundBomb(int row , int col){
-        row--;
-        col--;
-        int d1 = cells.length;
-        int d2 = cells[0].length;
-        for(int i=0 ; i< 3 ;i++)
-            for(int j=0 ;j < 3 ; j++)
-                if(row+i < d1 && col+j < d2 && row+i>=0 && col+j>=0)
-                    cells[row+i][col+j].setAroundBombs(cells[row+i][col+j].getAroundBombs()+1);
+        List<Cell> neighbours = getNeighbours(row,col);
+        for (Cell nei : neighbours){
+            nei.setAroundBombs(nei.getAroundBombs() +1);
+        }
+
+    }
+
+    private List<Cell> getNeighbours(int row,int col){
+        // return the cell[row][col] along with its neighbours
+        List<Cell> neighbours = new ArrayList<Cell>();
+        for(int i = row -1 ; i <= row+1 ; i++ )
+            for(int j = col -1 ; j <= col+1 ; j++)
+                if(i>=0 && i<cells.length    &&     j>=0 && j<cells[0].length)
+                    neighbours.add(cells[i][j]);
+        return neighbours;
     }
 
     @Override
@@ -69,22 +76,50 @@ public class PanelImp implements Panel {
 
         Integer row = selected.getKey();
         Integer col = selected.getValue();
-        Cell target = cells[row][col];
+        if(myDig(row,col))
+            return true;
+        else if(specialDigCheck(row,col)){
+            digAround(row,col);
+            return true;
+        }
+        return false;
+    }
 
-        if(target.dig()){
-            if(target.getBomb())
+    private Boolean myDig(int i , int j){
+
+        if(cells[i][j].dig()){
+            if(cells[i][j].getBomb())
                 gameStatus = GameStatus.lose;
             else{
                 remainDigs--;
                 if(remainDigs == 0)
                     gameStatus = GameStatus.win;
+                // if cell has no bombs around dig around it
+                if(cells[i][j].getAroundBombs() == 0)
+                    digAround(i,j);
+
             }
-            cells[row][col] = target;
             if(gameStatus!=GameStatus.going)
                 digAllBombs();
             return true;
         }
         return false;
+    }
+
+    private void digAround(int row,int col){
+        for(int i = row -1 ; i <= row+1 ; i++ )
+            for(int j = col -1 ; j <= col+1 ; j++)
+                if(i>=0 && i<cells.length    &&     j>=0 && j<cells[0].length)
+                    this.myDig(i,j);
+    }
+
+    private Boolean specialDigCheck(int row,int col){
+        List<Cell> neighbours = this.getNeighbours(row,col);
+        int countFlags = 0;
+        for(Cell nei : neighbours)
+            if(nei.getStatus() == CellStatus.flag)
+                countFlags++;
+        return cells[row][col].getStatus() == CellStatus.dig && countFlags == cells[row][col].getAroundBombs();
     }
 
     @Override
