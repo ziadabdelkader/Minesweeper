@@ -1,3 +1,5 @@
+import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.util.Pair;
 
 import java.util.*;
@@ -115,15 +117,12 @@ public class PanelImp implements Panel {
         }
     }
 
-    @Override
-    public Cell getCell(int row, int col) {
-        return cells[row][col];
-    }
-
 
     @Override
-    public Pair<Integer, Integer> getSelectedIndex() {
-        return selected;
+    public void updateView(List<Node> buttons) {
+        int cols = cells[0].length;
+        for(int i=0 ; i< buttons.size() ; i++ )
+            cells[i/cols][i%cols].updateView((Button) buttons.get(i));
     }
 
 

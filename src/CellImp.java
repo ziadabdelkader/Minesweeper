@@ -1,3 +1,5 @@
+import javafx.scene.control.Button;
+
 public class CellImp implements Cell {
     private Boolean bomb;
     private CellStatus status;
@@ -71,4 +73,20 @@ public class CellImp implements Cell {
     public Integer getAroundBombs() {
         return this.aroundBombs;
     }
+
+    @Override
+    public void updateView(Button button) {
+        if(this.status == CellStatus.flag){
+            button.setText("F");
+        }else if(status == CellStatus.active){
+            button.setText("");
+        }else{
+            if(this.getBomb())
+                button.setText("B");
+            else
+                button.setText(String.valueOf(this.getAroundBombs()));
+        }
+    }
+
+
 }

@@ -25,9 +25,8 @@ public class GUI extends Application {
         int flags = 35;
         Panel game = new PanelImp(rows,cols,flags);
 
-
-        GridPane gridPane = new GridPane();
-        gridPane.setAlignment(Pos.CENTER);
+        GridPane buttons = new GridPane();
+        buttons.setAlignment(Pos.CENTER);
         for(int i=0 ;i < rows ; i++ ) for(int j=0 ;j < cols ; j++){
             Button btn = new Button();
             btn.setId(String.valueOf(j + i*cols));
@@ -37,47 +36,32 @@ public class GUI extends Application {
                 int id = Integer.parseInt(btnClicked.getId());
                 game.select(id/cols,id%cols);
             });
-            gridPane.add(btn,j,i);
+            buttons.add(btn,j,i);
         }
 
         Button dig = new Button("DIG");
         dig.setOnAction(event -> {
             game.dig();
-            Pair<Integer,Integer> index = game.getSelectedIndex();
-            update((Button) gridPane.getChildren().get(index.getKey()*cols+index.getValue()), game.getCell(index.getKey(),index.getValue()));
-            if(game.getGameStatus() != GameStatus.going){
-                for(int i=0 ;i < rows ; i++ ) for(int j=0 ;j < cols ; j++)
-                    update((Button) gridPane.getChildren().get(i*cols+j), game.getCell(i,j));
-            }
+            game.updateView(buttons.getChildren());
         });
 
         Button flag = new Button("FLAG");
         flag.setOnAction(event -> {
             game.flag();
-            Pair<Integer,Integer> index = game.getSelectedIndex();
-            update((Button) gridPane.getChildren().get(index.getKey()*cols+index.getValue()), game.getCell(index.getKey(),index.getValue()));
+            game.updateView(buttons.getChildren());
         });
-        dig.setPrefSize(40*cols/2,
-                40*rows/10);
+        dig.setPrefSize(40*cols/2, 40*rows/10);
         flag.setPrefSize(40*cols/2,40*rows/10);
-        gridPane.add(dig,0,rows,cols/2,rows/10);
-        gridPane.add(flag,cols/2,rows,cols/2,rows/10);
+
+        GridPane root = new GridPane();
+        root.setAlignment(Pos.CENTER);
+        root.add(buttons , 0 , 0 , 2 , 10);
+        root.add(dig,0,10,1,1);
+        root.add(flag,1,10,1,1);
 
         primaryStage.setTitle("Minesweeper");
-        primaryStage.setScene(new Scene(gridPane, 800, 950));
+        primaryStage.setScene(new Scene(root, 800, 950));
         primaryStage.show();
     }
-    private void update(Button btn, Cell cell){
-        CellStatus status = cell.getStatus();
-        if(status == CellStatus.flag){
-            btn.setText("F");
-        }else if(status == CellStatus.active){
-            btn.setText("");
-        }else{
-            if(cell.getBomb())
-                btn.setText("B");
-            else
-                btn.setText(String.valueOf(cell.getAroundBombs()));
-        }
-    }
+
 }

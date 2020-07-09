@@ -1,4 +1,7 @@
+import javafx.scene.Node;
 import javafx.util.Pair;
+
+import java.util.List;
 
 public interface Panel {
     public Integer getNumOfFlags();
@@ -6,7 +9,8 @@ public interface Panel {
     public void select(int row , int col);
     public Boolean dig();
     public Boolean flag();
+
+    public void updateView(List<Node> buttons);
+
     public void printPanel();
-    public Cell getCell(int row , int col);
-    public Pair<Integer,Integer> getSelectedIndex();
 }
